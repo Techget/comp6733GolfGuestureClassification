@@ -6,6 +6,7 @@ import re
 # result = 1 - spatial.distance.cosine(dataSetI, dataSetII) # subtract from 1 to get the similarity
 # print(result)
 
+### read and extract entry from .txt file
 standard_file = 'setup.txt'
 noisy_file = 'dataset.txt'
 
@@ -34,7 +35,7 @@ with open(noisy_file) as f:
 		entry_read.extend(temp)
 		entry_read_count += 1
 
-
+### calculate the similarity, and pick those meet the threshold
 # this threshold is tunable, if you feel there should be more entries belong to setup phase, tune down the threshold
 SIMILARITY_THRESHOLD = 0.9994
 clean_data = []
