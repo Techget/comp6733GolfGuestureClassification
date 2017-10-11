@@ -15,7 +15,7 @@ with open(standard_file) as f:
 	for line in f:
 		temp = line.split(',')
 		temp = temp[:3]
-		temp = [float(x) * 10 for x in temp]
+		temp = [float(x) for x in temp]
 		standard_data.extend(temp)
 
 noisy_data = []
@@ -31,7 +31,7 @@ with open(noisy_file) as f:
 
 		temp = line.split(',')
 		temp = temp[:3]
-		temp = [float(x) * 10 for x in temp]
+		temp = [float(x) for x in temp]
 		entry_read.extend(temp)
 		entry_read_count += 1
 
