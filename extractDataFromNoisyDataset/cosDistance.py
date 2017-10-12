@@ -36,7 +36,7 @@ with open(noisy_file) as f:
 
 
 # this threshold is tunable, if you feel there should be more entries belong to setup phase, tune down the threshold
-SIMILARITY_THRESHOLD = 0.9994
+SIMILARITY_THRESHOLD = 0.9995
 clean_data = []
 for entry in noisy_data:
 	cos_similarity = 1 - spatial.distance.cosine(standard_data, entry)
@@ -44,10 +44,10 @@ for entry in noisy_data:
 	if cos_similarity > SIMILARITY_THRESHOLD:
 		clean_data.append(entry)
 
-print(len(noisy_data))
-print(len(clean_data))
-print(clean_data[-1])
-print('#####')
-print(standard_data)
+#print(len(noisy_data))
+print(clean_data)
+#print(clean_data[-1])
+#print('#####')
+#print(standard_data)
 
 
