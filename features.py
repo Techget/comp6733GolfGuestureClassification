@@ -41,6 +41,13 @@ HandTipLeft		= 22
 ThumbLeft		= 23
 HandTipRight	= 24
 ThumbRight		= 25
+
+setup			= 1
+topOfSwing		= 2
+impact			= 3
+followThrough	= 4
+finish			= 5
+
 #####################################################################################
 
 def readJointValues(file):
@@ -93,6 +100,13 @@ def getAngle(joint1, joint2, joint3):
 
 	return degrees
 
+def determineType(file):
+	if "setup" in file:
+		type = 1
+	elif "top" in file:
+		type = 2
+	elif "impact" in file:
+		type = 3
 # return the angle of 
 #	    joint1
 #      /
