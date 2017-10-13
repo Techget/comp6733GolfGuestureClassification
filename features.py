@@ -98,10 +98,10 @@ def getAngle(joint1, joint2, joint3):
 #      /
 #	  /
 #    joint2-----joint2
-def getAngle_test(join1, join2, join3):
-	joint1 = np.array(joint1)
-	joint2 = np.array(joint2)
-	joint3 = np.array(joint3)
+def getAngle_test(joint1, joint2, joint3):
+	joint1 = np.array(joint1.values())
+	joint2 = np.array(joint2.values())
+	joint3 = np.array(joint3.values())
 
 	vec12 = joint1 - joint2
 	vec32 = joint3 - joint2
@@ -109,12 +109,13 @@ def getAngle_test(join1, join2, join3):
 	cosine_angle = np.dot(vec12, vec32) / (np.linalg.norm(vec12) * np.linalg.norm(vec32))
 	angle = np.arccos(cosine_angle)
 
-	return angle
+	return np.degrees(angle)
 
 #################################################################
 
 if __name__ == "__main__":
     readJointValues(sys.argv[1])
     print "Stance width: %.2f cm" % (getDistance(joints[AnkleLeft],joints[AnkleRight])*100)
-    print "Knee Flexion(Right): %.2f Degrees" % (getKneeFlexion(joints[KneeRight],joints[HipRight],joints[AnkleRight])) 
-    print "Knee Flexion(Left): %.2f Degrees" % (getKneeFlexion(joints[KneeLeft],joints[HipLeft],joints[AnkleLeft])) 
+    print "Knee Flexion(Right): %.2f Degrees" % (getKneeFlexion(joints[HipRight],joints[KneeRight],joints[AnkleRight])) 
+    print "Knee Flexion(Left): %.2f Degrees" % (getKneeFlexion(joints[HipLeft],joints[KneeLeft],joints[AnkleLeft])) 
+    

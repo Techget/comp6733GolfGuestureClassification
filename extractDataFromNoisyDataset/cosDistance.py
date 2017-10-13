@@ -1,12 +1,15 @@
 from scipy import spatial
-import re
+import re,sys
 
 # dataSetI = [3, 45, 7, 2]
 # dataSetII = [2, 54, 13, 15]
 # result = 1 - spatial.distance.cosine(dataSetI, dataSetII) # subtract from 1 to get the similarity
 # print(result)
-
-standard_file = 'setup.txt'
+if len(sys.argv) != 2:
+    sys.stderr.write("Usage: %s <file>\n" % sys.argv[0])
+    sys.exit(1)
+    
+standard_file = sys.argv[1]
 noisy_file = 'dataset.txt'
 
 standard_data = []
