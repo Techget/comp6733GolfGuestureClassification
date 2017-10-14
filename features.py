@@ -76,37 +76,42 @@ def getKneeFlexion(Knee, Hip, Ankle):
 
 	return (np.pi - angles) * (180/np.pi)
 
-def getAngle(joint1, joint2, joint3):
-	vectorJ1toJ2 = np.array([joint1[X] - joint2[X], joint1[Y] - joint2[Y], 0])
-	vectorJ2toJ3 = np.array([joint2[X] - joint3[X], joint2[Y] - joint3[Y], 0])
+def getAngle(Joint1, Joint2, Joint3):
+	Joint1Pos = np.array([Joint1[X], Joint1[Y], Joint1[Z]])
+	Joint2Pos = np.array([Joint2[X], Joint2[Y], Joint2[Z]])
+	Joint3Pos = np.array([Joint3[X], Joint3[Y], Joint3[Z]])
 
-	vectorJ1toJ2 = vectorJ1toJ2.reshape(1,-1) 
+	vectorJ2toJ1 = Joint2Pos - Joint1Pos
+	vectorJ2toJ3 = Joint2Pos - Joint3Pos
+
+	vectorJ2toJ1 = vectorJ2toJ1.reshape(1,-1) 
 	vectorJ2toJ3 = vectorJ2toJ3.reshape(1,-1)
 
-	vectorJ1toJ2 = preprocessing.normalize(vectorJ1toJ2, norm='l2')
+	vectorJ2toJ1 = preprocessing.normalize(vectorJ2toJ1, norm='l2')
 	vectorJ2toJ3 = preprocessing.normalize(vectorJ2toJ3, norm='l2')
 
-	crossProduct = np.cross(vectorJ1toJ2, vectorJ2toJ3)
-	crossProductLength = crossProduct.item(2)
-
-	vectorJ1toJ2 = np.squeeze(vectorJ1toJ2)
+	vectorJ2toJ1 = np.squeeze(vectorJ2toJ1)
 	vectorJ2toJ3 = np.squeeze(vectorJ2toJ3)
 
-	dotProduct = np.dot(vectorJ1toJ2, vectorJ2toJ3)
-	segmentAngle = math.atan2(crossProductLength, dotProduct)
+	dotProduct = np.dot(vectorJ2toJ1, vectorJ2toJ3)
 
-	# Convert the result to degrees.
-	degrees = segmentAngle * (180 / math.pi)
+	return np.arccos(dotProduct) / np.pi * 180;
 
-	return degrees
 
 def determineType(file):
 	if "setup" in file:
-		type = 1
+		type = setup
 	elif "top" in file:
-		type = 2
+		type = topOfSwing
 	elif "impact" in file:
-		type = 3
+		type = impact
+	elif "follow" in file:
+		type = followThrough
+	elif "finish" in file:
+		type = finish
+
+	return type
+
 # return the angle of 
 #	    joint1
 #      /
@@ -128,8 +133,25 @@ def getAngle_test(joint1, joint2, joint3):
 #################################################################
 
 if __name__ == "__main__":
-    readJointValues(sys.argv[1])
-    print "Stance width: %.2f cm" % (getDistance(joints[AnkleLeft],joints[AnkleRight])*100)
-    print "Knee Flexion(Right): %.2f Degrees" % (getKneeFlexion(joints[HipRight],joints[KneeRight],joints[AnkleRight])) 
-    print "Knee Flexion(Left): %.2f Degrees" % (getKneeFlexion(joints[HipLeft],joints[KneeLeft],joints[AnkleLeft])) 
+	type = determineType(sys.argv[1])
+	readJointValues(sys.argv[1])
+
+	if type == setup:	
+		print "<=== Setup ===>"
+	#	print "Stance width: %.2f cm" % (getDistance(joints[AnkleLeft],joints[AnkleRight])*100)
+	elif type == topOfSwing:
+		print "<=== Top of swing ===>"
+	elif type == impact:
+		print "<=== Impact ===>"
+	elif type == followThrough:
+		print "<=== Follow Through===>"
     
+	print "Stance width: %.2f cm" % (getDistance(joints[AnkleLeft],joints[AnkleRight])*100)
+	print "Neck Angle: %.2f Degrees" % (getDistance(joints[ElbowLeft],joints[ElbowRight])*100)
+	print "Elbow Distance: %.2f cm" % (getAngle(joints[Head],joints[Neck],joints[SpineBase]))
+	print "Elbow Angle(Right): %.2f Degrees" % (getAngle(joints[ShoulderRight],joints[ElbowRight],joints[WristRight])) 
+	print "Elbow Angle(Left): %.2f Degrees" % (getAngle(joints[ShoulderLeft],joints[ElbowLeft],joints[WristLeft])) 
+	print "Hip bend: %.2f Degrees" % (getAngle(joints[SpineShoulder],joints[SpineBase],joints[AnkleRight])) 
+	print "Knee Flexion(Right): %.2f Degrees" % (getKneeFlexion(joints[HipRight],joints[KneeRight],joints[AnkleRight])) 
+	print "Knee Flexion(Left): %.2f Degrees" % (getKneeFlexion(joints[HipLeft],joints[KneeLeft],joints[AnkleLeft]))
+	print a
