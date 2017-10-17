@@ -53,7 +53,10 @@ finish			= 5
 def readJointValues(file):
 	j = SpineBase
 	for line in open(file):
+		line = line.strip()
 		values = line.split(',')
+		if not line:
+			continue
 		joints[j] = {'X': float(values[0].strip()), 'Y': float(values[1].strip()), 'Z': float(values[2].strip())}
 		if j < 25:
 			j += 1
@@ -144,8 +147,10 @@ if __name__ == "__main__":
 	elif type == impact:
 		print "<=== Impact ===>"
 	elif type == followThrough:
-		print "<=== Follow Through===>"
-    
+		print "<=== Follow Through ===>"
+	elif type == finish:
+		print "<=== Finish ===>"
+    	
 	print "Stance width: %.2f cm" % (getDistance(joints[AnkleLeft],joints[AnkleRight])*100)
 	print "Neck Angle: %.2f Degrees" % (getDistance(joints[ElbowLeft],joints[ElbowRight])*100)
 	print "Elbow Distance: %.2f cm" % (getAngle(joints[Head],joints[Neck],joints[SpineBase]))
@@ -154,4 +159,3 @@ if __name__ == "__main__":
 	print "Hip bend: %.2f Degrees" % (getAngle(joints[SpineShoulder],joints[SpineBase],joints[AnkleRight])) 
 	print "Knee Flexion(Right): %.2f Degrees" % (getKneeFlexion(joints[HipRight],joints[KneeRight],joints[AnkleRight])) 
 	print "Knee Flexion(Left): %.2f Degrees" % (getKneeFlexion(joints[HipLeft],joints[KneeLeft],joints[AnkleLeft]))
-	print a
