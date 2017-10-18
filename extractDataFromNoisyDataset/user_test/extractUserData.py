@@ -9,7 +9,12 @@ from sklearn.cluster import AgglomerativeClustering
 
 from sklearn.decomposition import PCA
 
-if len(sys.argv) != 3:
+import os
+
+import cosDisFeatureSVM
+
+
+if len(sys.argv) != 2:
 	sys.stderr.write("Usage: %s <file>\n" % sys.argv[0])
 USER_FILE = sys.argv[1]
 # NUMBEROfSWINGS = int(sys.argv[2])
@@ -25,12 +30,17 @@ IMPACT			= 3
 FOLLOWTHROUGH	= 4
 FINISH			= 5
 
+directory = os.path.dirname(__file__)
+# print(directory)
+
+# /import/adams/2/z5089812/comp6733GolfGuestureClassification/extractDataFromNoisyDataset/benchmark/setup.txt
+
 STANDARD_FILE_NAMES = {
-	SETUP: '../benchmark/setup.txt',
-	TOPOfSWING: '../benchmark/topofswing.txt',
-	IMPACT: '../benchmark/impact.txt',
-	FOLLOWTHROUGH: '../benchmark/followthrough.txt',
-	FINISH: '../benchmark/finish.txt'
+	SETUP: os.path.join(directory, "../benchmark/setup.txt"),
+	TOPOfSWING: os.path.join(directory, "../benchmark/topofswing.txt"),
+	IMPACT: os.path.join(directory, "../benchmark/impact.txt"),
+	FOLLOWTHROUGH: os.path.join(directory, "../benchmark/followthrough.txt"),
+	FINISH: os.path.join(directory, "../benchmark/finish.txt")
 }
 
 standard_data = {}
@@ -80,49 +90,23 @@ for entry in noisy_data:
 
 # it's like take an image from a video, those 5 images correspond to 5 phase
 for i in range(SETUP, FINISH + 1):
-	for j in range(1):
-		clean_data[i].append(heapq.heappop(clean_data_temp[i])[1])
+	clean_data[i].append(heapq.heappop(clean_data_temp[i])[1])
 
-# print(clean_data[1][0])
 
+# print(len(clean_data[1][0]))
 #########
 # each phase contains 1 samples, and each sample contains 75 feature
 #########
 
-##### PCA #####
-def doPCA(data):
-	pca = PCA(n_components=3)
-	return pca.fit_transform(data)
-
-clean_data_pca = {}
+############ extract features
+clean_data_features = {}
 for i in range(SETUP, FINISH + 1):
-	clean_data_pca[i] = doPCA(clean_data[i])
+	clean_data_features[i] = []
 
-# print(clean_data_pca[SETUP][0])
+for i in range(SETUP, FINISH + 1):
+	clean_data_features[i].append(cosDisFeatureSVM.calculateFeatures(clean_data[i][0]))
 
-##### print out 3d image, if n_components = 3
-# from mpl_toolkits.mplot3d import Axes3D
-# import matplotlib.pyplot as plt
-# import numpy as np
-
-# fig = plt.figure()
-# ax = fig.add_subplot(111, projection='3d')
-
-# for i in range(0, TOP_K_NUM):
-# 	xs = [clean_data_pca[SETUP][i][0]]
-# 	ys = [clean_data_pca[SETUP][i][1]]
-# 	zs = [clean_data_pca[SETUP][i][2]]
-# 	if label[i] == 0:
-# 		ax.scatter(xs, ys, zs, c=10, marker='o')
-# 	elif label[i] ==1:
-# 		ax.scatter(xs, ys, zs, c=50, marker='^')
-
-# ax.set_xlabel('X Label')
-# ax.set_ylabel('Y Label')
-# ax.set_zlabel('Z Label')
-
-# plt.show()
-######
+# print(clean_data_features)
 
 ########### load the trained model
 from sklearn.externals import joblib
@@ -134,6 +118,7 @@ for i in range(SETUP, FINISH + 1):
 
 
 for i in range(SETUP, FINISH + 1):
-	print(clean_data[i])
-	print(SVM_models[i].predict(clean_data_pca[i]))
+	# print(clean_data[i])
+	# print(clean_data_features[i])
+	print(SVM_models[i].predict(clean_data_features[i]))
 
