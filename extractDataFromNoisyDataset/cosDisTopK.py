@@ -26,11 +26,11 @@ FOLLOWTHROUGH	= 4
 FINISH			= 5
 
 STANDARD_FILE_NAMES = {
-	SETUP: 'setup.txt',
-	TOPOfSWING: 'topofswing.txt',
-	IMPACT: 'impact.txt',
-	FOLLOWTHROUGH: 'followthrough.txt',
-	FINISH: 'finish.txt'
+	SETUP: 'benchmark/setup.txt',
+	TOPOfSWING: 'benchmark/topofswing.txt',
+	IMPACT: 'benchmark/impact.txt',
+	FOLLOWTHROUGH: 'benchmark/followthrough.txt',
+	FINISH: 'benchmark/finish.txt'
 }
 
 standard_data = {}

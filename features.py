@@ -119,7 +119,8 @@ def determineType(file):
 #	    joint1
 #      /
 #	  /
-#    joint2-----joint2
+#    joint2-----joint3
+
 def getAngle_test(joint1, joint2, joint3):
 	joint1 = np.array(joint1.values())
 	joint2 = np.array(joint2.values())
