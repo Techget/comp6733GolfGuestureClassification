@@ -100,13 +100,13 @@ Z = 'Z'
 def calculateFeatures(features_list):
 	output = []
 	# getDistance(joints[AnkleLeft],joints[AnkleRight])*100
-	joint1 = {X:features_list[features.AnkleLeft*3], Y:features_list[features.AnkleLeft*3 + 1], Z:features_list[features.AnkleLeft*3 + 2]}
-	joint2 = {X:features_list[features.AnkleRight*3], Y:features_list[features.AnkleRight*3 + 1], Z:features_list[features.AnkleRight*3 + 2]}
-	output.append(features.getDistance(joint1, joint2) * 100)
-	#  getDistance(joints[ElbowLeft],joints[ElbowRight])*100
-	joint1 = {X:features_list[features.ElbowLeft*3], Y:features_list[features.ElbowLeft*3 + 1], Z:features_list[features.ElbowLeft*3 + 2]}
-	joint2 = {X:features_list[features.ElbowRight*3], Y:features_list[features.ElbowRight*3 + 1], Z:features_list[features.ElbowRight*3 + 2]}
-	output.append(features.getDistance(joint1, joint2) * 100)
+	# joint1 = {X:features_list[features.AnkleLeft*3], Y:features_list[features.AnkleLeft*3 + 1], Z:features_list[features.AnkleLeft*3 + 2]}
+	# joint2 = {X:features_list[features.AnkleRight*3], Y:features_list[features.AnkleRight*3 + 1], Z:features_list[features.AnkleRight*3 + 2]}
+	# output.append(features.getDistance(joint1, joint2) * 100)
+	# #  getDistance(joints[ElbowLeft],joints[ElbowRight])*100
+	# joint1 = {X:features_list[features.ElbowLeft*3], Y:features_list[features.ElbowLeft*3 + 1], Z:features_list[features.ElbowLeft*3 + 2]}
+	# joint2 = {X:features_list[features.ElbowRight*3], Y:features_list[features.ElbowRight*3 + 1], Z:features_list[features.ElbowRight*3 + 2]}
+	# output.append(features.getDistance(joint1, joint2) * 100)
 	# getAngle(joints[Head],joints[Neck],joints[SpineBase])
 	joint1 = {X:features_list[features.Head*3], Y:features_list[features.Head*3 + 1], Z:features_list[features.Head*3 + 2]}
 	joint2 = {X:features_list[features.Neck*3], Y:features_list[features.Neck*3 + 1], Z:features_list[features.Neck*3 + 2]}

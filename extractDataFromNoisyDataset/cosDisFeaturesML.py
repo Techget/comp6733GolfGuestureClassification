@@ -22,6 +22,10 @@ NUMBEROfSWINGS = 40
 # it's just an estimate, if user swing 30 times, approximately 25 set maybe captured
 TOP_K_NUM = NUMBEROfSWINGS - 15
 
+INCORRECT_SWING_NOISY_FILE = 'bigdatasets/26incorrectswingdataset.txt'
+INCORRECT_SWING_NUMBERofSWINGS = 26
+INCORRECT_SWING_TOP_K_NUM = INCORRECT_SWING_NUMBERofSWINGS - 8
+
 SETUP			= 1
 TOPOfSWING		= 2
 IMPACT			= 3
@@ -47,6 +51,7 @@ for i in range(1,6):
 			temp_list.extend(temp)
 	standard_data[i] = temp_list
 
+###### data preprocessing, extract from noisy dataset
 
 noisy_data = []
 DATA_ENTRY_AMOUNT = 25
@@ -86,11 +91,41 @@ for i in range(SETUP, FINISH + 1):
 	for j in range(TOP_K_NUM):
 		clean_data[i].append(heapq.heappop(clean_data_temp[i])[1])
 
-# print(clean_data[1][0])
 
-#########
-# each phase contains TOP_K_NUM samples, and each sample contains 75 feature
-#########
+incorrect_swing_noisy_data = []
+entry_read_count = 0
+entry_read = []
+with open(INCORRECT_SWING_NOISY_FILE) as f:
+	for line in f:
+		if entry_read_count == DATA_ENTRY_AMOUNT:
+			incorrect_swing_noisy_data.append(entry_read)
+			entry_read = []
+			entry_read_count = 0
+
+		temp = line.split(',')
+		temp = temp[:3]
+		temp = [float(x) for x in temp]
+		entry_read.extend(temp)
+		entry_read_count += 1
+
+incorrect_swing_clean_data_temp = {}
+incorrect_swing_clean_data = {}
+
+for i in range(SETUP, FINISH + 1):
+	incorrect_swing_clean_data[i] = []
+	incorrect_swing_clean_data_temp[i] = []
+
+# add to heapq, which is a min-heap, the similarity make corresponding change,
+# does not include `1 -`. 
+for entry in incorrect_swing_noisy_data:
+	for i in range(SETUP, FINISH + 1):
+		cos_similarity_without_minus_1 = spatial.distance.cosine(standard_data[i], entry)
+		heapq.heappush(incorrect_swing_clean_data_temp[i], (cos_similarity_without_minus_1, entry))
+
+# pick the top-k entry, which is closest to standard gesture for each phase
+for i in range(SETUP, FINISH + 1):
+	for j in range(INCORRECT_SWING_TOP_K_NUM):
+		incorrect_swing_clean_data[i].append(heapq.heappop(incorrect_swing_clean_data_temp[i])[1])
 
 ############ extract features
 X = 'X'
@@ -99,14 +134,14 @@ Z = 'Z'
 
 def calculateFeatures(features_list):
 	output = []
-	# getDistance(joints[AnkleLeft],joints[AnkleRight])*100
-	joint1 = {X:features_list[features.AnkleLeft*3], Y:features_list[features.AnkleLeft*3 + 1], Z:features_list[features.AnkleLeft*3 + 2]}
-	joint2 = {X:features_list[features.AnkleRight*3], Y:features_list[features.AnkleRight*3 + 1], Z:features_list[features.AnkleRight*3 + 2]}
-	output.append(features.getDistance(joint1, joint2) * 100)
-	#  getDistance(joints[ElbowLeft],joints[ElbowRight])*100
-	joint1 = {X:features_list[features.ElbowLeft*3], Y:features_list[features.ElbowLeft*3 + 1], Z:features_list[features.ElbowLeft*3 + 2]}
-	joint2 = {X:features_list[features.ElbowRight*3], Y:features_list[features.ElbowRight*3 + 1], Z:features_list[features.ElbowRight*3 + 2]}
-	output.append(features.getDistance(joint1, joint2) * 100)
+	# # getDistance(joints[AnkleLeft],joints[AnkleRight])*100
+	# joint1 = {X:features_list[features.AnkleLeft*3], Y:features_list[features.AnkleLeft*3 + 1], Z:features_list[features.AnkleLeft*3 + 2]}
+	# joint2 = {X:features_list[features.AnkleRight*3], Y:features_list[features.AnkleRight*3 + 1], Z:features_list[features.AnkleRight*3 + 2]}
+	# output.append(features.getDistance(joint1, joint2) * 100)
+	# #  getDistance(joints[ElbowLeft],joints[ElbowRight])*100
+	# joint1 = {X:features_list[features.ElbowLeft*3], Y:features_list[features.ElbowLeft*3 + 1], Z:features_list[features.ElbowLeft*3 + 2]}
+	# joint2 = {X:features_list[features.ElbowRight*3], Y:features_list[features.ElbowRight*3 + 1], Z:features_list[features.ElbowRight*3 + 2]}
+	# output.append(features.getDistance(joint1, joint2) * 100)
 	# getAngle(joints[Head],joints[Neck],joints[SpineBase])
 	joint1 = {X:features_list[features.Head*3], Y:features_list[features.Head*3 + 1], Z:features_list[features.Head*3 + 2]}
 	joint2 = {X:features_list[features.Neck*3], Y:features_list[features.Neck*3 + 1], Z:features_list[features.Neck*3 + 2]}
@@ -144,55 +179,76 @@ for i in range(SETUP, FINISH + 1):
 		clean_data_features[i].append(calculateFeatures(clean_data[i][j]))
 
 
-# ##### Hierarchical clustering ########
+incorrect_swing_clean_data_features = {}
+for i in range(SETUP, FINISH + 1):
+	incorrect_swing_clean_data_features[i] = []
+
+for i in range(SETUP, FINISH + 1):
+	for j in range(INCORRECT_SWING_TOP_K_NUM):
+		incorrect_swing_clean_data_features[i].append(calculateFeatures(incorrect_swing_clean_data[i][j]))
+
+
+####### label the data
+
 clean_data_lable = {}
-for i in range(SETUP, FINISH + 1): 
-	ward = AgglomerativeClustering(n_clusters=2, linkage='complete',
-		affinity='cosine').fit(clean_data_features[i])
-	clean_data_lable[i] = ward.labels_ # it is the classification obtained by agglomerative clustering
 
+for i in range(SETUP, FINISH + 1):
+	clean_data_lable[i] = []
 
-print(clean_data_lable)
+for i in range(SETUP, FINISH + 1):
+	for j in range(TOP_K_NUM):
+		clean_data_lable[i].append(1)
+	for j in range(INCORRECT_SWING_TOP_K_NUM):
+		clean_data_lable[i].append(2)
+
+# print(clean_data_lable)
 
 ############ SVM model
-# from sklearn import svm
+from sklearn import svm
 
-# SVMs = {}
+SVMs = {}
 
-# SVM_C_value = {
-# 	SETUP: 1,
-# 	TOPOfSWING: 0.3,
-# 	IMPACT: 10,
-# 	FOLLOWTHROUGH: 1,
-# 	FINISH:1
-# }
-
-
-# for i in range(SETUP, FINISH + 1):
-# 	clf = svm.SVC(C = SVM_C_value[i]) 
-# 	clf.fit(clean_data_features[i], clean_data_lable[i])
-# 	SVMs[i] = clf
-
-########## DecisionTree
-from sklearn import tree
-from sklearn.ensemble import RandomForestClassifier
-
-DTs = {}
-
-DT_max_depth = {
-	SETUP: None,
-	TOPOfSWING: 5,
-	IMPACT: None,
-	FOLLOWTHROUGH: None,
-	FINISH: None
+SVM_C_value = {
+	SETUP: 0.8,
+	TOPOfSWING: 2,
+	IMPACT: 0.8,
+	FOLLOWTHROUGH: 2,
+	FINISH: 1.2
 }
 
 for i in range(SETUP, FINISH + 1):
-	clf = RandomForestClassifier(n_estimators=10, max_depth=3, min_samples_split=2, random_state=0)
-	clf.fit(clean_data_features[i], clean_data_lable[i])
-	DTs[i] = clf
+	clf = svm.SVC(C = SVM_C_value[i]) 
+	clf.fit(clean_data_features[i] + incorrect_swing_clean_data_features[i], clean_data_lable[i])
+	SVMs[i] = clf
+
+########## DecisionTree
+# from sklearn import tree
+# from sklearn.ensemble import RandomForestClassifier
+
+# DTs = {}
+
+# DT_max_depth = {
+# 	SETUP: 5,
+# 	TOPOfSWING: 5,
+# 	IMPACT: 5,
+# 	FOLLOWTHROUGH: 3,
+# 	FINISH: 3
+# }
+
+# class_weights = {
+# 	1: 10,
+# 	2: 5
+# }
+
+# for i in range(SETUP, FINISH + 1):
+# 	clf = RandomForestClassifier(n_estimators=50, max_depth = DT_max_depth[i], random_state = 42, class_weight = class_weights)
+# 	print(len(clean_data_features[i]))
+# 	print(len(incorrect_swing_clean_data_features[i]))
+# 	print(len(clean_data_lable[i]))
+# 	clf.fit(clean_data_features[i] + incorrect_swing_clean_data_features[i], clean_data_lable[i])
+# 	DTs[i] = clf
 
 ########### Save the trained model
 from sklearn.externals import joblib
 for i in range(SETUP, FINISH + 1):
-	joblib.dump(DTs[i], 'user_test/classifier_%d.pkl' % i) 
+	joblib.dump(SVMs[i], 'user_test/classifier_%d.pkl' % i) 
