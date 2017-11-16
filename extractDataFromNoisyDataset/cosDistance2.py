@@ -60,32 +60,40 @@ FOLLOWTHROUGH_THRESHOLD = 0.9979
 FINISH_THRESHOLD = 0.9984
 
 clean_data = {}
+clean_data_frame = {}
 
 for i in range(1,6):
 	clean_data[i] = []
+	clean_data_frame[i] = []
+	
+for frameNum,entry in enumerate(noisy_data):
 
-for entry in noisy_data:
 	for i in range(1,6):
 		cos_similarity = 1 - spatial.distance.cosine(standard_data[i], entry)
 	
 		if i == SETUP and cos_similarity > SETUP_SIMILARITY_THRESHOLD:
 			clean_data[i].append(entry)
+			clean_data_frame[i].append(frameNum)
 			break
 		
 		if i == TOPOfSWING and cos_similarity > TOPOfSWING_SIMILARITY_THRESHOLD:
 			clean_data[i].append(entry)
+			clean_data_frame[i].append(frameNum)
 			break
 
 		if i == IMPACT and cos_similarity > IMPACT_THRESHOLD:
 			clean_data[i].append(entry)
+			clean_data_frame[i].append(frameNum)
 			break
 
 		if i == FOLLOWTHROUGH and cos_similarity > FOLLOWTHROUGH_THRESHOLD:
 			clean_data[i].append(entry)
+			clean_data_frame[i].append(frameNum)
 			break
 
 		if i == FINISH and cos_similarity > FINISH_THRESHOLD:
 			clean_data[i].append(entry)
+			clean_data_frame[i].append(frameNum)
 			break
 
 #print(len(noisy_data))
@@ -93,7 +101,10 @@ for entry in noisy_data:
 #print(clean_data[-1])
 #print('#####')
 #print(standard_data)
+#print (str(len(noisy_data)) + " frames captured")
+#print (str(len(noisy_data)/30) + " seconds")
+# for i in range(1,6):
+#	print(clean_data[i][0])
+#print(clean_data[SETUP][1])
 
-for i in range(1,6):
-	print(len(clean_data[i]))
-
+print (len(clean_data[FOLLOWTHROUGH]))
