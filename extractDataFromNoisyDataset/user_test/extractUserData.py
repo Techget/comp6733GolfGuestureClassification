@@ -30,6 +30,15 @@ IMPACT			= 3
 FOLLOWTHROUGH	= 4
 FINISH			= 5
 
+# more loose threshold when compare to the one we used to extract entries
+THRESHOLDS = {
+	SETUP: 0.999913,
+	TOPOfSWING: 0.99957,
+	IMPACT: 0.9998,
+	FOLLOWTHROUGH: 0.99905,
+	FINISH: 0.9992
+}
+
 directory = os.path.dirname(__file__)
 # print(directory)
 
@@ -90,7 +99,12 @@ for entry in noisy_data:
 
 # it's like take an image from a video, those 5 images correspond to 5 phase
 for i in range(SETUP, FINISH + 1):
-	clean_data[i].append(heapq.heappop(clean_data_temp[i])[1])
+	entry = heapq.heappop(clean_data_temp[i])
+	if THRESHOLDS[i] < 1 - entry[0]:
+		clean_data[i].append(entry[1])
+	else:
+		clean_data[i].append([0] * len(entry[1]))
+
 
 
 # print(len(clean_data[1][0]))
@@ -104,7 +118,10 @@ for i in range(SETUP, FINISH + 1):
 	clean_data_features[i] = []
 
 for i in range(SETUP, FINISH + 1):
-	clean_data_features[i].append(cosDisFeatureSVM.calculateFeatures(clean_data[i][0]))
+	if clean_data[i][0] == [0] * len(clean_data[i][0]):
+		clean_data_features[i].append('Not Found')
+	else:
+		clean_data_features[i].append(cosDisFeatureSVM.calculateFeatures(clean_data[i][0]))
 
 # print(clean_data_features)
 
@@ -120,5 +137,8 @@ for i in range(SETUP, FINISH + 1):
 for i in range(SETUP, FINISH + 1):
 	# print(clean_data[i])
 	# print(clean_data_features[i])
-	print(SVM_models[i].predict(clean_data_features[i]))
+	if clean_data_features[i][0] == 'Not Found':
+		print('Not captured')
+	else:
+		print(SVM_models[i].predict(clean_data_features[i]))
 
