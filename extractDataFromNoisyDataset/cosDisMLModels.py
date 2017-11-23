@@ -17,8 +17,9 @@ import features
 # NOISY_FILE = sys.argv[1]
 # NUMBEROfSWINGS = int(sys.argv[2])
 
-NOISY_FILE = 'bigdatasets/40swingdataset.txt'
-NUMBEROfSWINGS = 40
+# bigdatasets/40swingdataset.txt
+NOISY_FILE = 'bigdatasets/30correctswing(lab).txt'
+NUMBEROfSWINGS = 30
 # it's just an estimate, if user swing 30 times, approximately 25 set maybe captured
 # TOP_K_NUM = NUMBEROfSWINGS - 15
 
@@ -40,12 +41,12 @@ STANDARD_FILE_NAMES = {
 	FINISH: 'benchmark/finish.txt'
 }
 
-THREASHOLDS = {
-	SETUP: 0.99952,
-	TOPOfSWING: 0.998852,
-	IMPACT: 0.99857,
-	FOLLOWTHROUGH: 0.9979,
-	FINISH: 0.9984
+THRESHOLDS = {
+	SETUP: 0.999938,
+	TOPOfSWING: 0.99965,
+	IMPACT: 0.999821,
+	FOLLOWTHROUGH: 0.9992,
+	FINISH: 0.99938
 }
 
 standard_data = {}
@@ -101,12 +102,12 @@ for i in range(SETUP, FINISH + 1):
 	record_how_many_get_picked = 0
 	while stop_flag == False:
 		entry = heapq.heappop(clean_data_temp[i])
-		if entry[0] > THREASHOLDS[i]:
+		if entry[0] < 1 - THRESHOLDS[i]:
 			clean_data[i].append(entry[1])
 			record_how_many_get_picked += 1
 		else:
-			stop_flag == True
-			print('record_how_many_get_picked, for ', i, 'recored: ', record_how_many_get_picked)
+			stop_flag = True
+			# print('record_how_many_get_picked, for ', i, 'recored: ', record_how_many_get_picked)
 
 
 incorrect_swing_noisy_data = []
@@ -268,6 +269,7 @@ for i in range(SETUP, FINISH + 1):
 # 	DTs[i] = clf
 
 ########### Save the trained model
+print('save the trained model')
 from sklearn.externals import joblib
 for i in range(SETUP, FINISH + 1):
 	joblib.dump(SVMs[i], 'user_test/classifier_%d.pkl' % i) 
