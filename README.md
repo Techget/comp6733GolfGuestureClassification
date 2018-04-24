@@ -7,4 +7,4 @@ Use ML skills to train the model. To train use 'extractDataFromNoisyDataset/cosD
 
 To test use `extractDataFromNoisyDataset/user_test/extractUserData.py`.
 
-The file structure is a bit messy. To have a general view of this project please have a look on our [report](https://docs.google.com/document/d/1j6iBWV4sbD-YEUeSJFBiiwwlSZaQpTlvAImwyT5QIDU)
+The file structure is a bit messy. To have a detailed view of this project please have a look on our [report](https://docs.google.com/document/d/1j6iBWV4sbD-YEUeSJFBiiwwlSZaQpTlvAImwyT5QIDU)
